@@ -1,5 +1,5 @@
 <?php namespace App\Http\Controllers;
-
+Use
 class WelcomeController extends Controller {
 
 	/*

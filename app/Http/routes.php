@@ -17,6 +17,8 @@ Route::get('home', 'HomeController@index');
 
 Route::get('test', 'HomeController@test');
 
+Route::get('orders', )
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

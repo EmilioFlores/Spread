@@ -7,6 +7,7 @@ use App\topping;
 use App\syrup;
 use App\milk;
 use App\shot;
+use App\order;
 use App\option;
 use App\personalization;
 
@@ -679,7 +680,7 @@ class HomeController extends Controller {
 							case '12':
 
 
-								/ Start priting the bill 
+								// Start priting the bill 
 
 
 	        						$columna = strtolower($personalization->size);
@@ -713,7 +714,7 @@ class HomeController extends Controller {
 
 
 								$name = $message;
-								order::create(['personalization_id' => $personalization->id, 'name' => ' ', 'status' => '0', 'total' => $total]);
+								order::create(['personalization_id' => $personalization->id, 'name' => $name, 'status' => '0', 'total' => $total]);
 
 								$answer = "Gracias por su orden";
 								$w->sendMessage($tel, $answer);
