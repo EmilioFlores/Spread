@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use App\milk
+use Illuminate\Database\Eloquent\Model;
+use App\milk;
 
 class SeedMilks extends Migration {
 
