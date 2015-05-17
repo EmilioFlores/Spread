@@ -67,7 +67,7 @@ class HomeController extends Controller {
 		        $customer = customer::where('phone', '=', $tel)->first();
 
 
-		        $personalization = $customer->personalizations->max('transaction');
+		        $personalization = $customer->personalizations()->max('transaction');
 
 		        if ($personalization) {
 		        	$step = $personalizations->step;
@@ -214,11 +214,12 @@ class HomeController extends Controller {
     							if (in_array($message, $sizes) {
 
     								// Query all the types of milk available and append them to a variable
-    								$milk = milks::all();
+    								$milk = milk::orderBy('name', 'asc')->get();
     								$answer = '\n';
-		        					foreach ($milk as $key => $value) {
-		        						
-		        						$answer .=  $key + 1 . ') ' . $value . '\n';
+    								$i = 1;
+		        					foreach ($milk as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
 		        					}
 
     								// Send the message to the user with the possible milk
@@ -230,16 +231,319 @@ class HomeController extends Controller {
 
     							} else {
     								$w->sendMessage($tel, "¿Qué tamaño desea? \n 1) Alto \n 2) Grande \n 3) Venti");
+
     							}
     							break;
 							case '5':
-								# Screen asking for the syrup tipe
+								# Screen asking for the toppings tipe
+								
+
+								// Select the key index of the milk in the array
+								$milk = milk::orderBy('name', 'asc')->get();
+								$i = 1;
+	        					foreach ($milk as $key) {
+	        						if ($i == $message) {
+	        							$milk = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
+
+								// Check if the given messege is an actual milk
+								if ($found) {
+
+									// Query all the possible and append it to a variable
+									$toppings = topping::orderBy('name','asc')->get();
+									$answer = '\n';
+	        						$i = 1;
+		        					foreach ($toppings as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+
+									// Send the message to the user with the possible toppings
+    								$w->sendMessage($tel, "¿Qué toppings desea?" . $answer);									
+									
+    								
+
+
+									// Update the milk that was chosen by the user and send them to the next screen
+									$personalization->update(['milk' => $milk, 'step' => 6]);
+
+								} else {
+
+									// Query all the types of milk available and append them to a variable
+    								$answer = '\n';
+    								$i = 1;
+		        					foreach ($milk as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+    								// Send the message to the user with the possible milk
+    								$w->sendMessage($tel, "¿Qué leche desea?" . $answer);
+
+								}
 								break;
 							case '6':
-								# Screen asking for the toppings
+								# Screen asking for the syrup
+								
+								$input = explode(",", $message);
+								$toppingKey = $input[0];
+								$toppingAmount =  $input[1];
+
+								$toppings = topping::orderBy('name', 'asc')->get();
+								$i = 1;
+	        					foreach ($toppings as $key) {
+	        						if ($i == $toppingKey) {
+	        							$topping = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
+
+
+
+								// Check if the given messege is an actual topping
+								if ( $found ) {
+									
+									// Query all the possible syrup and append it to a variable
+	
+		        					$syrups = syrup::orderBy('name','asc')->get();
+									$answer = '\n';
+	        						$i = 1;
+		        					foreach ($syrups as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+
+									// Send the message to the user with the possible toppings
+    								$w->sendMessage($tel, "¿Qué jarabe desea?" . $answer);
+
+									
+									$personalization->personalizationTopping()->Create(['name' =>  $topping, 'amount' => $toppingAmount]);
+									$personalization->update(['step' => 7]);
+
+								} else {
+
+									// The inputed topping did not match any option
+    								
+    								$answer = '\n';
+	        						$i = 1;
+		        					foreach ($toppings as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+    								// Send the message to the user with the possible syrup
+    								$w->sendMessage($tel, "¿Qué leche desea?" . $answer);
+
+								}
 								break;
 							case '7':	
-								# Screen showing the final order with the total to be paid
+								# Screen asking for the shot desired
+								
+
+								$input = explode(",", $message);
+								$syrupKey = $input[0];
+								$syrupAmount =  $input[1];
+
+
+								$syrups = syrup::orderBy('name', 'asc')->get();
+								$i = 1;
+	        					foreach ($syrups as $key) {
+	        						if ($i == $syrupKey) {
+	        							$syrup = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
+
+
+								// Check if the given messege is an actual topping
+								if ( $found ) {
+									
+									// Query all the possible syrup and append it to a variable
+	
+		        					$shots = shot::orderBy('name','asc')->get();
+									$answer = '\n';
+	        						$i = 1;
+		        					foreach ($shots as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+
+									// Send the message to the user with the possible toppings
+    								$w->sendMessage($tel, "¿Qué shot desea?" . $answer);
+
+									
+									$personalization->personalizationSyrup()->Create(['name' =>  $syrup, 'amount' => $syrupAmount]);
+									$personalization->update(['step' => 8]);
+
+								} else {
+
+													// The inputed topping did not match any option
+    								
+    								$answer = '\n';
+	        						$i = 1;
+		        					foreach ($syrups as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+									// Send the message to the user with the possible syrups
+    								$w->sendMessage($tel, "¿Qué jarabe desea?" . $answer);
+
+
+								}
+								break;
+							case '8':
+								# Screen asking for the temperature 
+								
+								$input = explode(",", $message);
+								$shotKey = $input[0];
+								$shotAmount =  $input[1];
+
+
+								$shots = shot::orderBy('name', 'asc')->get();
+								$i = 1;
+	        					foreach ($shots as $key) {
+	        						if ($i == $shotKey) {
+	        							$shot = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
+
+
+								// Check if the given messege is an actual topping
+								if ( $found ) {
+									
+
+									// Send the message to the user with the possible toppings
+    								$w->sendMessage($tel, "¿Qué temperatura desea? \n 1) Frio \n 2) Caliente \n 3) Extra caliente");
+
+									
+									$personalization->personalizationShots()->Create(['name' =>  $shot, 'amount' => $shotAmount]);
+									$personalization->update(['step' => 9]);
+
+								} else {
+
+									// The inputed topping did not match any shot
+    								$answer = '\n';
+	        						$i = 1;
+		        					foreach ($shots as $key) {
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
+		        					}
+
+									// Send the message to the user with the possible toppings
+    								$w->sendMessage($tel, "¿Qué shot desea?" . $answer);
+
+
+								}
+							case '9':
+									# Screen asking for the foam desired
+									
+	    							$temperatures = array("1"=>"Frio", "2"=>"Caliente", "3" => "Extra Caliente");
+	    							$i = 1;
+		        					foreach ($temperatures as $key) {
+		        						if ($i == $message) {
+		        							$temperature = $key;
+		        							$found = true;
+		        						}
+		        						$i++;
+		        					}
+
+
+	    							// Check if the message inputed is an actual size 
+	    							if ($found) {
+
+
+	    								$w->sendMessage($tel, "¿Qué espuma desea? \n 1) Sin Espuma \n 2) Poca Espuma \n 3) Normal \n 4) Mucha Espuma ");
+
+	    								// Update the size that was chosen by the user and send them to the next screen
+			        					$personalization->update(['temperature' => $temperature, 'step' => 10]);
+
+    								} else {
+
+    									$w->sendMessage($tel, "¿Qué temperatura desea? \n 1) Frio \n 2) Caliente \n 3) Extra caliente");
+    								}
+
+
+							break;
+							case '10':
+								
+
+    							$foams = array("1"=>"Sin Espuma", "2"=>"Poca Espuma", "3" => "Normal", "4" => "Mucha Espuma");
+
+    							// Check if the message inputed is an actual size 
+    							$i = 1;
+	        					foreach ($foams as $key) {
+	        						if ($i == $message) {
+	        							$foam = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
+
+	        					if ($found) {
+
+	        						
+	        						
+	        						// Start priting the bill 
+	        						$bill = "Resumen de su orden: \n";
+	        						$bill .= $personalization->option . "\n";
+	        						$sizeCost =  option::where('name','=', $personalization->option)->$personalization->size;
+	        						$bill .= $personalization->size . "\t" . $sizeCost . "\n"; ##########################
+	        						
+	        						$milkCost = milk::where('name','=', $personalization->milk)->$cost;
+	        						$bill .= $personalization->milk . "\t" .  $milkCost . "\n"; 
+	        						$bill .= $personalization->foam . "\t" .  "0.0" . "\n";  
+	        						$bill .= $personalization->temperature . "\t" .  "0.0" . "\n"; 
+
+	        						$subtotal = $sizeCost + $milkCost;
+        							$bill .= "Subtotal: \t " . $subtotal;
+
+        							// Get the possible multiple selections
+	        						$toppings = $personalization->personlaizationToppings();
+	        						$syrups = $personalization->personlaizationSyrups();
+	        						$shots = $personalization->personalizationShots();
+
+	        						$bill .= "Shots: \n";
+	        						$shotCosts = 0.0;
+	        						foreach ($shots as $key) {
+		        						$bill .=  $key->name . "\t" . $key->cost . "\n";
+		        						$shotCosts += $key->cost;
+		        					}
+
+		        					$bill .= "Toppings: \n";
+		        					$toppingsCost = 0.0;
+	        						foreach ($toppings as $key) {
+		        						$bill .=  $key->name . "\t" . $key->cost . "\n";
+		        						$toppingsCost += $key->cost;
+		        					}
+
+		        					$bill .= "Syrups: \n";
+		        					$syrupsCost = 0.0;
+	        						foreach ($syrups as $key) {
+		        						$bill .=  $key->name . "\t" . $key->cost . "\n";
+		        						$syrupsCost += $key->cost;
+		        					}
+		        					$total = $subtotal +  $shotCosts + $toppingsCost + $syrupsCost; 
+		        					$bill .= "Total: \t" .   $total; 
+
+    								$w->sendMessage($tel, $bill);
+    								
+									
+									$personalization->personalizationShots()->Create(['name' =>  $shot, 'amount' => $shotAmount]);
+									$personalization->update(['step' => 9]);
+
+	        					}
+
 								break;
 		        			default:
 		        				# code...
