@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrdersTable extends Migration {
+class CreateTypesTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,10 +12,11 @@ class CreateOrdersTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('orders', function(Blueprint $table)
+		Schema::create('types', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->decimal('total');
+			$table->integer('modality_id')->unsigned();
+			$table->string('name');
 			$table->timestamps();
 		});
 	}
@@ -27,7 +28,7 @@ class CreateOrdersTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('orders');
+		Schema::drop('types');
 	}
 
 }

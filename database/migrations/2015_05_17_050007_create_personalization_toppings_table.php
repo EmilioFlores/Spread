@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTransactionsTable extends Migration {
+class CreatePersonalizationToppingsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,10 +12,12 @@ class CreateTransactionsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('transactions', function(Blueprint $table)
+		Schema::create('personalization_toppings', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('transactionNumber');
+			$table->integer('personalization_id')->unsigned();
+			$table->string('name');
+			$table->decimal('cost');
 			$table->timestamps();
 		});
 	}
@@ -27,7 +29,7 @@ class CreateTransactionsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('transactions');
+		Schema::drop('personalization_toppings');
 	}
 
 }

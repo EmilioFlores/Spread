@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCustomerStepsTable extends Migration {
+class CreatePersonalizationShotsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,10 +12,12 @@ class CreateCustomerStepsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('customer_steps', function(Blueprint $table)
+		Schema::create('personalization_shots', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('stepNumber');
+			$table->integer('personalization_id')->unsigned();
+			$table->string('name');
+			$table->decimal('cost');
 			$table->timestamps();
 		});
 	}
@@ -27,7 +29,7 @@ class CreateCustomerStepsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('customer_steps');
+		Schema::drop('personalization_shots');
 	}
 
 }

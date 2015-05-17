@@ -15,7 +15,15 @@ class CreatePersonalizationsTable extends Migration {
 		Schema::create('personalizations', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->decimal('cost');
+			$table->integer('customer_id')->unsigned();
+			$table->string('code');
+			$table->string('modality');
+			$table->string('type');
+			$table->string('option');
+			$table->string('size');
+			$table->string('milk');
+			$table->string('foam');
+			$table->string('temperature');
 			$table->timestamps();
 		});
 	}

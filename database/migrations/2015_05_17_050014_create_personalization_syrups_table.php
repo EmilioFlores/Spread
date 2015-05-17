@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCoffesTable extends Migration {
+class CreatePersonalizationSyrupsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,11 +12,12 @@ class CreateCoffesTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('coffes', function(Blueprint $table)
+		Schema::create('personalization_syrups', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('code');
-			$table->decimal('subtotal');
+			$table->integer('personalization_id')->unsigned();
+			$table->string('name');
+			$table->decimal('cost');
 			$table->timestamps();
 		});
 	}
@@ -28,7 +29,7 @@ class CreateCoffesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('coffes');
+		Schema::drop('personalization_syrups');
 	}
 
 }
