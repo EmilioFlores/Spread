@@ -383,12 +383,19 @@ class HomeController extends Controller {
 								# Screen asking for the syrup
 								
 								$input = explode(",", $message);
+
+								// check if the delimeter was found
+								if ($input) {
+
+								}
 								$toppingKey = $input[0];
 								$toppingAmount =  $input[1];
+
 
 								$toppings = topping::orderBy('name', 'asc')->get();
 								$found = false;
 								$i = 1;
+
 	        					foreach ($toppings as $key) {
 	        						if ($i == $toppingKey) {
 	        							$topping = $key->name;
