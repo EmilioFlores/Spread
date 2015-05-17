@@ -2,6 +2,12 @@
 use Request;
 use App\customer;
 use App\modality;
+use App\type;
+use App\topping;
+use App\syrup;
+use App\milk;
+use App\shot;
+use App\option;
 use App\personalization;
 
 class HomeController extends Controller {
@@ -109,8 +115,12 @@ class HomeController extends Controller {
 				        } else {
 				        	if ($message == "1") {
 				        		$customer->personalizations()->save( new personalization(array('code' => ' ', 'modality' => ' ', 'type' => ' ', 'option' => ' ', 'size' => ' ', 'milk' => ' ', 'step' => '1', 'foam' => ' ', 'temperature' =>  ' ', 'transaction' =>'1')));
-	        					//$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
+
+				        		$transaction = $customer->personalizations()->count();
+				        		$personalization = personalization::where('transaction', '=', $transaction)->first();
+				        		//$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
 				        		$stepNumber = 1;
+
 				        	} else {
 				        		$w->sendMessage($tel, "Bienvenidos al sistema inteligente de Starbucks. Para usar el servicio tan solo responda las preguntas que se le harán y seleccione la opcion o la palabra que desea. \n 1) continuar \n 2) salir");	
 
@@ -119,12 +129,10 @@ class HomeController extends Controller {
 
 
 		        		switch ($stepNumber) {
-		      
-		        			case '1':
-		        				# Screen asking for the type of the coffe cold or hot
-		        				if ($message == '1' || $message == '2' ) {
+		      				case '0':
+		      					if ($message == '1' || $message == '2' ) {
 
-	        						// Query the modality from the personalization
+	      							// Query the modality from the personalization
 	        						if($message==1) {
 	        							$modality=modality::where('name' ,'=','Frio')->first();
 	        						}
@@ -132,26 +140,46 @@ class HomeController extends Controller {
 	        							$modality=modality::where('name' ,'=','Caliente')->first();
 	        						}
 		        					// Query the types given the modality
-		        					$types = $modality->types()->get()->toArray();
+		        					$types = $modality->types;
 
 	        						// Loop from the available types and append them to a variable to display to the user
-		        					$answer = '\n';
+		        					$answer = "\n ";
 		        					$i=1;
 		        					foreach ($types as $key ) {
-		        						
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name .  " \n ";
 		        						$i++;
 		        					}
 
 		        					// Send the message to the user with the beberage types
 		        					$w->sendMessage($tel, "Que tipo de bebida?" .  $answer);
+		        					
 
-		        					// Update the modality that was chosen by the user and update the step in which the user is on 
-		        					$personalization->update(['modality' => $message, 'step' => 2]);
+		        					if ($message == 1 ) {
+		        						$personalization->update(['modality' => "Frio", 'step' => 2]);
+		        						
+		        					} else {
+		        						$personalization->update(['modality' => "Caliente", 'step' => 2]);
+
+		        					}
+		      							
+		      					} else {
+		        					$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
+		      					}
+
+	      					break;
+		        			case '1':
+		        				# Screen asking for the type of the coffe cold or hot
+		        				if ($message == '1' || $message == '2' ) {
+
+
+		        					// Send the message to the user with the beberage types
+		        					
+		        					$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
+		        					$personalization->update(['step' => 0]);
 
 		        				} else {
 		        					// When the user did not answer what was expected, send him the same message again 
-		        					$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
+									$w->sendMessage($tel, "Bienvenidos al sistema inteligente de Starbucks. Para usar el servicio tan solo responda las preguntas que se le harán y seleccione la opcion o la palabra que desea. \n 1) continuar \n 2) salir");			      						
 
 		        				}
 		        				break;
@@ -160,30 +188,34 @@ class HomeController extends Controller {
 	        					# If you get to this screen, then save the answer to the question of what type of coffe
 	        					
 	        					// Query the modality from the personalization
-	        					$modality = $personalization;
+	        					$modality = $personalization->modality;
+	        					var_dump("modalityyyy",$modality);
+	        					$modality = modality::where('name','=',$modality)->first();
 	        					// Query the types given the modality
-	        					$types = $modality->types()->get()->toArray();
+	        					$types = $modality->types;
 
+	        					$found = false;
 	        					$i = 1;
 	        					foreach ($types as $key) {
 	        						if ($i == $message) {
-	        							$typeFound = $key;
+	        							$typeFound = $key->name;
 	        							$found = true;
 	        						}
 	        						$i++;
 	        					}
 	        					// Check if the message inputed by the user is found in all the available types 
 	        					if ($found) {
+									var_dump("Estooooo", $typeFound, "Antes");
 									
-									$type = type::where('name','=',$typeFound);
+									$type = type::where('name','=',$typeFound)->first();
 									// Query the options available from the given types		        					
-		        					$options = $type->options()->get()->toArray();
+		        					$options = $type->options;
 
 		        					// Loop from the available options and append them to a variable to display to the user
-		        					$answer = '\n';
-		        					$i = 0;
+		        					$answer = " \n ";
+		        					$i = 1;
 		        					foreach ($options as $key) {
-		        						$answer .=  $i  . ') ' . $key . '\n';
+		        						$answer .=  $i  . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
@@ -197,11 +229,11 @@ class HomeController extends Controller {
 		        				} else {
 
 	        						// The answer was not correct, loop from the availabele types and append them to a variable
-		        					$answer = '\n';
-		        					$i=1;
+		        					$answer = " \n ";
+		        					$i=1; 
 		        					foreach ($types as $key ) {
 		        						
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
@@ -214,14 +246,16 @@ class HomeController extends Controller {
         					case '3':		
         						# Screen asking for the size of beberage
         						// Query the type from the personalization previously chosen
-	        					$type = type::where('name','=',$personalization->type);
+	        					$type = type::where('name','=',$personalization->type)->first();
+	        					
 								// Query the options available from the given types		        					
-	        					$options = $type->options()->get()->toArray();
+	        					$options = $type->options;
 
 	        					$i = 1;
+	        					$found = false;
 	        					foreach ($options as $key) {
 	        						if ($i == $message) {
-	        							$optionFound = $key;
+	        							$optionFound = $key->name;
 	        							$found = true;
 	        						}
 	        						$i++;
@@ -241,11 +275,11 @@ class HomeController extends Controller {
 		        				} else {
 
 		        					// The answer was not correct, loop from the availabele types and append them to a variable
-		        					$answer = '\n';
+		        					$answer = " \n ";
 		        					$i=1;
 		        					foreach ($options as $key ) {
 		        						
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
@@ -258,6 +292,7 @@ class HomeController extends Controller {
     							
     							$sizes = array("1" => "Alto", "2" => "Grande", "3"=>"Venti");
     							$i = 1;
+    							$found = false;
 	        					foreach ($sizes as $key) {
 	        						if ($i == $message) {
 	        							$sizeFound = $key;
@@ -271,10 +306,10 @@ class HomeController extends Controller {
 
     								// Query all the types of milk available and append them to a variable
     								$milk = milk::orderBy('name', 'asc')->get();
-    								$answer = '\n';
+    								$answer = " \n ";
     								$i = 1;
 		        					foreach ($milk as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
@@ -297,9 +332,10 @@ class HomeController extends Controller {
 								// Select the key index of the milk in the array
 								$milk = milk::orderBy('name', 'asc')->get();
 								$i = 1;
+								$found = false;
 	        					foreach ($milk as $key) {
 	        						if ($i == $message) {
-	        							$milk = $key;
+	        							$milk = $key->name;
 	        							$found = true;
 	        						}
 	        						$i++;
@@ -310,16 +346,16 @@ class HomeController extends Controller {
 
 									// Query all the possible and append it to a variable
 									$toppings = topping::orderBy('name','asc')->get();
-									$answer = '\n';
+									$answer = " \n ";
 	        						$i = 1;
 		        					foreach ($toppings as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
 
 									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué toppings desea?" . $answer);									
+    								$w->sendMessage($tel, "¿Qué toppings desea? \n (Escribir  [numero], [cantidad] )" . $answer);									
 									
     								
 
@@ -330,10 +366,10 @@ class HomeController extends Controller {
 								} else {
 
 									// Query all the types of milk available and append them to a variable
-    								$answer = '\n';
+    								$answer = " \n ";
     								$i = 1;
 		        					foreach ($milk as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
@@ -350,10 +386,11 @@ class HomeController extends Controller {
 								$toppingAmount =  $input[1];
 
 								$toppings = topping::orderBy('name', 'asc')->get();
+								$found = false;
 								$i = 1;
 	        					foreach ($toppings as $key) {
 	        						if ($i == $toppingKey) {
-	        							$topping = $key;
+	        							$topping = $key->name;
 	        							$found = true;
 	        						}
 	        						$i++;
@@ -367,34 +404,37 @@ class HomeController extends Controller {
 									// Query all the possible syrup and append it to a variable
 	
 		        					$syrups = syrup::orderBy('name','asc')->get();
-									$answer = '\n';
+									$answer = " \n " ;
 	        						$i = 1;
 		        					foreach ($syrups as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n " ;
 		        						$i++;
 		        					}
 
 
 									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué jarabe desea?" . $answer);
+    								$w->sendMessage($tel, "¿Qué jarabe desea? (Escribir  [numero], [cantidad] )" . $answer);
 
 									
-									$personalization->personalizationTopping()->create(['name' =>  $topping, 'amount' => $toppingAmount]);
+									$personalization->personalizationToppings()->create(['name' =>  $topping, 'amount' => $toppingAmount]);
 									$personalization->update(['step' => 7]);
 
 								} else {
 
 									// The inputed topping did not match any option
     								
-    								$answer = '\n';
+    								$toppings = topping::orderBy('name','asc')->get();
+									$answer = " \n ";
 	        						$i = 1;
 		        					foreach ($toppings as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
-    								// Send the message to the user with the possible syrup
-    								$w->sendMessage($tel, "¿Qué leche desea?" . $answer);
+
+									// Send the message to the user with the possible toppings
+    								$w->sendMessage($tel, "¿Qué toppings desea? \n  (Escribir  [numero], [cantidad] )" . $answer);									
+									
 
 								}
 								break;
@@ -408,10 +448,11 @@ class HomeController extends Controller {
 
 
 								$syrups = syrup::orderBy('name', 'asc')->get();
+								$found = false;
 								$i = 1;
 	        					foreach ($syrups as $key) {
 	        						if ($i == $syrupKey) {
-	        							$syrup = $key;
+	        							$syrup = $key->name;
 	        							$found = true;
 	        						}
 	        						$i++;
@@ -424,34 +465,34 @@ class HomeController extends Controller {
 									// Query all the possible syrup and append it to a variable
 	
 		        					$shots = shot::orderBy('name','asc')->get();
-									$answer = '\n';
+									$answer = " \n " ;
 	        						$i = 1;
 		        					foreach ($shots as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
 
 									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué shot desea?" . $answer);
+    								$w->sendMessage($tel, "¿Qué shot desea? \n  Escribir  [numero], [cantidad] )" . $answer);
 
 									
-									$personalization->personalizationSyrup()->Create(['name' =>  $syrup, 'amount' => $syrupAmount]);
+									$personalization->personalizationSyrups()->Create(['name' =>  $syrup, 'amount' => $syrupAmount]);
 									$personalization->update(['step' => 8]);
 
 								} else {
 
 													// The inputed topping did not match any option
     								
-    								$answer = '\n';
+    								$answer = " \n ";
 	        						$i = 1;
 		        					foreach ($syrups as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
 									// Send the message to the user with the possible syrups
-    								$w->sendMessage($tel, "¿Qué jarabe desea?" . $answer);
+    								$w->sendMessage($tel, "¿Qué jarabe desea?  \n  (Escribir  [numero], [cantidad] )" . $answer);
 
 
 								}
@@ -465,10 +506,11 @@ class HomeController extends Controller {
 
 
 								$shots = shot::orderBy('name', 'asc')->get();
+								$found = false;
 								$i = 1;
 	        					foreach ($shots as $key) {
 	        						if ($i == $shotKey) {
-	        							$shot = $key;
+	        							$shot = $key->name;
 	        							$found = true;
 	        						}
 	        						$i++;
@@ -489,23 +531,25 @@ class HomeController extends Controller {
 								} else {
 
 									// The inputed topping did not match any shot
-    								$answer = '\n';
+    								$answer = " \n ";
 	        						$i = 1;
 		        					foreach ($shots as $key) {
-		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$answer .=  $i . ') ' . $key->name . " \n ";
 		        						$i++;
 		        					}
 
 									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué shot desea?" . $answer);
+    								$w->sendMessage($tel, "¿Qué shot desea? \n (Escribir  [numero], [cantidad] )" . $answer);
 
 
 								}
+							break;
 							case '9':
 									# Screen asking for the foam desired
 									
 	    							$temperatures = array("1"=>"Frio", "2"=>"Caliente", "3" => "Extra Caliente");
 	    							$i = 1;
+	    							$found = true;
 		        					foreach ($temperatures as $key) {
 		        						if ($i == $message) {
 		        							$temperature = $key;
@@ -538,6 +582,7 @@ class HomeController extends Controller {
 
     							// Check if the message inputed is an actual size 
     							$i = 1;
+    							$found = false;
 	        					foreach ($foams as $key) {
 	        						if ($i == $message) {
 	        							$foam = $key;
@@ -553,8 +598,11 @@ class HomeController extends Controller {
 	        						// Start priting the bill 
 	        						$bill = "Resumen de su orden: \n";
 	        						$bill .= $personalization->option . "\n";
-	        						$sizeCost =  option::where('name','=', $personalization->option)->$personalization->size;
-	        						$bill .= $personalization->size . "\t" . $sizeCost . "\n"; ##########################
+	        						$columna = strtolower($personalization->size);
+	        						var_dump("ColumnaEs", $columna);
+	        						$sizeCost =  option::where('name','=', $personalization->option)->$columna;
+	        						$bill .= $personalization->size . "      " . $sizeCost . "\n"; ##########################
+	        						//$bill .= $personalization->size . "\t" . $sizeCost . "\n"; ##########################
 	        						
 	        						$milkCost = milk::where('name','=', $personalization->milk)->$cost;
 	        						$bill .= $personalization->milk . "\t" .  $milkCost . "\n"; 
@@ -562,8 +610,8 @@ class HomeController extends Controller {
 	        						$bill .= $personalization->temperature . "\t" .  "0.0" . "\n"; 
 
 	        						$subtotal = $sizeCost + $milkCost;
+        							$w->sendMessage($tel, $subtotal);
         							$bill .= "Subtotal: \t " . $subtotal;
-
         							// Get the possible multiple selections
 	        						$toppings = $personalization->personlaizationToppings();
 	        						$syrups = $personalization->personlaizationSyrups();
@@ -620,8 +668,6 @@ class HomeController extends Controller {
 		        
         		
 
-		        $user = customer::all()->toArray();
-		        var_dump("Hola", $user);
 
     }
     // $line = fgets_u(STDIN);

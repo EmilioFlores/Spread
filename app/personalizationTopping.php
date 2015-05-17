@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class personalizationTopping extends Model {
 
-	protected $fillable =['name', 'cost'];
+	protected $fillable =['name', 'amount'];
 
 	public function personalization()
 	{

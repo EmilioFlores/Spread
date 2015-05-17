@@ -17,7 +17,7 @@ class CreatePersonalizationToppingsTable extends Migration {
 			$table->increments('id');
 			$table->integer('personalization_id')->unsigned();
 			$table->string('name');
-			$table->decimal('cost');
+			$table->integer('amount');
 			$table->timestamps();
 		});
 	}
