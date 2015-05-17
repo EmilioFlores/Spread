@@ -147,7 +147,7 @@ class HomeController extends Controller {
 
 		        					// Loop from the available options and append them to a variable to display to the user
 		        					$answer = '\n';
-		        					foreach ($types as $key => $value) {
+		        					foreach ($options as $key => $value) {
 		        						
 		        						$answer .=  $key + 1 . ') ' . $value . '\n';
 		        					}
@@ -184,6 +184,9 @@ class HomeController extends Controller {
 	        					// Check if the message inputed by the user is found in all the available options 
 	        					if (in_array($message, $options)) {
 	        						
+
+
+
 	        						// Send the message to the user with the possible sizes
 		        					$w->sendMessage($tel, "¿Qué tamaño desea? \n 1) Alto \n 2) Grande \n 3) Venti");
 
@@ -192,20 +195,42 @@ class HomeController extends Controller {
 
 		        				} else {
 
-		        					
+		        					// The answer was not correct, loop from the availabele types and append them to a variable
 		        					$answer = '\n';
-		        					foreach ($types as $key => $value) {
+		        					foreach ($options as $key => $value) {
 		        						
 		        						$answer .=  $key + 1 . ') ' . $value . '\n';
 		        					}
 		        					$w->sendMessage($tel, "Que tipo de bebida?" .  $answer);
 
 		        				}
-
-
         						break;
     						case '4':
     							# Screen asking for the type of milk 
+    							
+    							$sizes = array("Alto", "Grande", "Venti");
+
+    							// Check if the message inputed is an actual size 
+    							if (in_array($message, $sizes) {
+
+    								// Query all the types of milk available and append them to a variable
+    								$milk = milks::all();
+    								$answer = '\n';
+		        					foreach ($milk as $key => $value) {
+		        						
+		        						$answer .=  $key + 1 . ') ' . $value . '\n';
+		        					}
+
+    								// Send the message to the user with the possible milk
+    								$w->sendMessage($tel, "¿Qué leche desea?" . $answer);
+
+    								// Update the size that was chosen by the user and send them to the next screen
+		        					$personalization->update(['size' => $message, 'step' => 5]);
+
+
+    							} else {
+    								$w->sendMessage($tel, "¿Qué tamaño desea? \n 1) Alto \n 2) Grande \n 3) Venti");
+    							}
     							break;
 							case '5':
 								# Screen asking for the syrup tipe
