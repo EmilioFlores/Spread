@@ -623,7 +623,7 @@ class HomeController extends Controller {
 	        						$bill .= "\n Shots: \n";
 	        						$shotCosts = 0.0;
 	        						foreach ($shots as $key) {
-	        							$cost = shot::where('name','=',$key->name) * $key->amount;
+	        							$cost = shot::where('name','=',$key->name)->first()->cost * $key->amount;
 		        						$bill .=  $key->name . "---- $" . cost . " \n ";
 		        						$shotCosts += $cost;
 		        					}
@@ -632,7 +632,7 @@ class HomeController extends Controller {
 		        					$toppingsCost = 0.0;
 		        					
 	        						foreach ($toppings as $key) {
-	        							$cost = topping::where('name','=',$key->name) * $key->amount;
+	        							$cost = topping::where('name','=',$key->name)->first()->cost * $key->amount;
 		        						$bill .=  $key->name . "---- $" . $cost . " \n ";
 		        						$toppingsCost += $cost;
 		        					}
@@ -640,7 +640,7 @@ class HomeController extends Controller {
 		        					$bill .= "Syrups: \n";
 		        					$syrupsCost = 0.0;
 	        						foreach ($syrups as $key) {
-	        							$cost = syrup::where('name','=',$key->name) * $key->amount;
+	        							$cost = syrup::where('name','=',$key->name)->first()->cost * $key->amount;
 		        						$bill .=  $key->name . "---- $" . $cost . " \n ";
 		        						$syrupsCost += $cost;
 		        					}
