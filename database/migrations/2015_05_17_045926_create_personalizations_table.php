@@ -24,6 +24,8 @@ class CreatePersonalizationsTable extends Migration {
 			$table->string('milk');
 			$table->string('foam');
 			$table->string('temperature');
+			$table->integer('step');
+			$table->integer('transaction');
 			$table->timestamps();
 		});
 	}

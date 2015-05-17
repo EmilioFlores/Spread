@@ -1,6 +1,8 @@
 <?php namespace App\Http\Controllers;
 use Request;
 use App\customer;
+use App\modality;
+use App\personalization;
 
 class HomeController extends Controller {
 
@@ -23,6 +25,13 @@ class HomeController extends Controller {
 	public function __construct()
 	{
 		//$this->middleware('auth');
+	}
+
+	public function test() {
+
+		$frio = modality::where('name','=','Caliente')->first();
+		var_dump($frio->types->toArray());	
+
 	}
 
 	/**
@@ -67,7 +76,9 @@ class HomeController extends Controller {
 		        $customer = customer::where('phone', '=', $tel)->first();
 
 
-		        $personalization = $customer->personalizations()->max('transaction');
+		        
+		        /*
+		        var_dump("Perzonalization",$personalization);
 
 		        if ($personalization) {
 		        	$step = $personalizations->step;
@@ -77,21 +88,28 @@ class HomeController extends Controller {
 		        	$step = 0;
 		        }
 
-
+		        */
 		        if ($customer) {
-		        		// Get the last step that the client is working on and save it in $stepNumber
-		        		$transactionNumber = $customer->transaction;
+		        		$transaction = $customer->personalizations()->count();
 
+		        		$personalization = personalization::where('transaction', '=', $transaction)->first();
+
+		        		// personalization::where('phone','=',$tel)->count();
+///		        		$w->sendMessage($tel, "Tu telefono es: " . $transaction);
+		        		//$personalization = $customer->personalizations()->max('transaction');
+		        		// Get the last step that the client is working on and save it in $stepNumber
+
+		        		var_dump("Perzonalization",$personalization);
 		        		// If the customer is already registered in, then we have to know in which step he was working on
 		        		// We then select the step that the customer has a 
 		        		
 		        		if ($personalization) {
-				        	$stepNumber = $personalizations->step;
+				        	$stepNumber = $personalization->step;
 				        	
 				        } else {
 				        	if ($message == "1") {
-				        		$personalization = personalization::create(['code' => ' ', 'modality' => ' ', 'type' => ' ', 'option' => ' ', 'size' => ' ', 'milk' => ' ', 'transaction' =>  $customer->transaction, 'step' => '1']);
-	        					$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente" . $tel);
+				        		$customer->personalizations()->save( new personalization(array('code' => ' ', 'modality' => ' ', 'type' => ' ', 'option' => ' ', 'size' => ' ', 'milk' => ' ', 'step' => '1', 'foam' => ' ', 'temperature' =>  ' ',)));
+	        					//$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
 				        		$stepNumber = 1;
 				        	} else {
 				        		$w->sendMessage($tel, "Bienvenidos al sistema inteligente de Starbucks. Para usar el servicio tan solo responda las preguntas que se le harán y seleccione la opcion o la palabra que desea. \n 1) continuar \n 2) salir");	
@@ -211,7 +229,7 @@ class HomeController extends Controller {
     							$sizes = array("Alto", "Grande", "Venti");
 
     							// Check if the message inputed is an actual size 
-    							if (in_array($message, $sizes) {
+    							if (in_array($message, $sizes) ){
 
     								// Query all the types of milk available and append them to a variable
     								$milk = milk::orderBy('name', 'asc')->get();
@@ -553,10 +571,10 @@ class HomeController extends Controller {
 		        } else {
 		        		// First time the user uses the service
 		        		// Register the user given the phone number
-		        		$customer = customer::create(['phone' => $tel, 'transaction' => 1]);
+		        		$customer = customer::create(['phone' => $tel]);
 		        		
 		        		// This is the second transaction (second screen)
-		        		$w->sendMessage($tel, "Bienvenidos al sistema inteligente de Starbucks. Para usar el servicio tan solo responda las preguntas que se le harán y seleccione la opcion o la palabra que desea. \n 1) continuar \n 2) salir" . $tel);
+		        		$w->sendMessage($tel, "Bienvenidos al sistema inteligente de Starbucks. Para usar el servicio tan solo responda las preguntas que se le harán y seleccione la opcion o la palabra que desea. \n 1) continuar \n 2) salir" );
         				
 
 		        }

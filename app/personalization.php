@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class personalization extends Model {
 
-	protected $fillable =['code', 'modality', 'type', 'option', 'size', 'milk', 'foam', 'temperature'];
+	protected $fillable =['code', 'modality', 'type', 'option', 'size', 'milk', 'foam', 'temperature','step','transaction'];
 
 	public function order()
 	{

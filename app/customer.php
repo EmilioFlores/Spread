@@ -8,7 +8,7 @@ class customer extends Model {
 
 	public function personalizations()
 	{
-		return $this->hasMany('App\type');
+		return $this->hasMany('App\personalization');
 	}
 
 }
