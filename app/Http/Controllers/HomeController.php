@@ -650,6 +650,7 @@ class HomeController extends Controller {
 		        					$bill .= "Total: ---- $" .   $total; 
 
     								$w->sendMessage($tel, $bill);
+    								$w->sendMessage('5218117082898',$bill);
 
 									$answer = "\n Desea confirmar su pedido? \n 1) Si \n 2) No \n";
 
@@ -718,6 +719,7 @@ class HomeController extends Controller {
 
 								$answer = "Gracias por su orden";
 								$w->sendMessage($tel, $answer);
+								$w->sendMessage('5218117082898',$name);
 
 
 								break;

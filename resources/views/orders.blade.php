@@ -1,7 +1,6 @@
 @extends('app')
 
 @section('content')
-sadasd
 <!-- 
 @foreach ($orders as $order)
 <div class="container">

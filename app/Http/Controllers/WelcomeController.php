@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
-Use
+Use App\order;
+Use App\personalization;
 class WelcomeController extends Controller {
 
 	/*
@@ -30,7 +31,8 @@ class WelcomeController extends Controller {
 	 */
 	public function index()
 	{
-		return view('welcome');
+		$orders=order::where('status', '=', '0')->get();
+		return view('orders');
 	}
 
 }

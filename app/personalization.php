@@ -25,6 +25,10 @@ class personalization extends Model {
 	{
 		return $this->hasMany('App\personalizationShot');
 	}
+	public function option()
+	{
+		return $this->hasOne('App\option');
+	}
 
 
 }
