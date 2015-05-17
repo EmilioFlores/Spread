@@ -624,7 +624,7 @@ class HomeController extends Controller {
 	        						$shotCosts = 0.0;
 	        						foreach ($shots as $key) {
 	        							$cost = shot::where('name','=',$key->name)->first()->cost * $key->amount;
-		        						$bill .=  $key->name . "---- $" . cost . " \n ";
+		        						$bill .=  $key->name . "---- $" . $cost . " \n ";
 		        						$shotCosts += $cost;
 		        					}
 
