@@ -594,57 +594,64 @@ class HomeController extends Controller {
 	        					if ($found) {
 
 	        						
+									$personalization->update(['foam' => $foam, 'step' => 11]);
 	        						
 	        						// Start priting the bill 
 	        						$bill = "Resumen de su orden: \n";
 	        						$bill .= $personalization->option . "\n";
 	        						$columna = strtolower($personalization->size);
-	        						var_dump("ColumnaEs", $columna);
-	        						$sizeCost =  option::where('name','=', $personalization->option)->$columna;
-	        						$bill .= $personalization->size . "      " . $sizeCost . "\n"; ##########################
-	        						//$bill .= $personalization->size . "\t" . $sizeCost . "\n"; ##########################
+	        						$sizeCost =  option::where('name','=', $personalization->option)->first()->$columna;
 	        						
-	        						$milkCost = milk::where('name','=', $personalization->milk)->$cost;
-	        						$bill .= $personalization->milk . "\t" .  $milkCost . "\n"; 
-	        						$bill .= $personalization->foam . "\t" .  "0.0" . "\n";  
-	        						$bill .= $personalization->temperature . "\t" .  "0.0" . "\n"; 
+	        						
+	        						$bill .= $personalization->size . "---- $" . $sizeCost . "\n"; ##########################
+	        						
+	        						$milkCost = milk::where('name','=', $personalization->milk)->first()->cost;
+	        						$bill .= $personalization->milk . "---- $" .  $milkCost . "\n"; 
+	        						$bill .= $personalization->foam . "---- $" .  "0.0" . "\n";  
+	        						$bill .= $personalization->temperature . "---- $" .  "0.0" . "\n"; 
 
 	        						$subtotal = $sizeCost + $milkCost;
-        							$w->sendMessage($tel, $subtotal);
-        							$bill .= "Subtotal: \t " . $subtotal;
-        							// Get the possible multiple selections
-	        						$toppings = $personalization->personlaizationToppings();
-	        						$syrups = $personalization->personlaizationSyrups();
-	        						$shots = $personalization->personalizationShots();
+        							
+        							$bill .= "Subtotal: ---- $" . $subtotal;
 
+        							// Get the possible multiple selections
+	        						$syrups = $personalization->personalizationSyrups;
+	        						$toppings = $personalization->personalizationToppings;
+	        						$shots = $personalization->personalizationShots;
+
+	        						
 	        						$bill .= "Shots: \n";
 	        						$shotCosts = 0.0;
 	        						foreach ($shots as $key) {
-		        						$bill .=  $key->name . "\t" . $key->cost . "\n";
+		        						$bill .=  $key->name . "---- $" . $key->cost . "\n";
 		        						$shotCosts += $key->cost;
 		        					}
 
 		        					$bill .= "Toppings: \n";
 		        					$toppingsCost = 0.0;
+		        					
 	        						foreach ($toppings as $key) {
-		        						$bill .=  $key->name . "\t" . $key->cost . "\n";
+		        						$bill .=  $key->name . "---- $" . $key->cost . "\n";
 		        						$toppingsCost += $key->cost;
 		        					}
 
 		        					$bill .= "Syrups: \n";
 		        					$syrupsCost = 0.0;
 	        						foreach ($syrups as $key) {
-		        						$bill .=  $key->name . "\t" . $key->cost . "\n";
+		        						$bill .=  $key->name . "---- $" . $key->cost . "\n";
 		        						$syrupsCost += $key->cost;
 		        					}
 		        					$total = $subtotal +  $shotCosts + $toppingsCost + $syrupsCost; 
-		        					$bill .= "Total: \t" .   $total; 
+	        						
+		        					$bill .= "Total: ---- $" .   $total; 
 
     								$w->sendMessage($tel, $bill);
 
 									
-									$personalization->personalizationShots()->Create(['name' =>  $shot, 'amount' => $shotAmount]);
 									$personalization->update(['step' => 9]);
+
+	        						/*
+									*/
 
 	        					}
 
