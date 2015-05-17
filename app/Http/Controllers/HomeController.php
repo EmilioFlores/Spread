@@ -323,7 +323,7 @@ class HomeController extends Controller {
     								$w->sendMessage($tel, "¿Qué jarabe desea?" . $answer);
 
 									
-									$personalization->personalizationTopping()->Create(['name' =>  $topping, 'amount' => $toppingAmount]);
+									$personalization->personalizationTopping()->create(['name' =>  $topping, 'amount' => $toppingAmount]);
 									$personalization->update(['step' => 7]);
 
 								} else {
@@ -537,7 +537,7 @@ class HomeController extends Controller {
 		        					$bill .= "Total: \t" .   $total; 
 
     								$w->sendMessage($tel, $bill);
-    								
+
 									
 									$personalization->personalizationShots()->Create(['name' =>  $shot, 'amount' => $shotAmount]);
 									$personalization->update(['step' => 9]);
