@@ -83,9 +83,18 @@ class SeedTypes extends Migration {
 		$type->options()->save(new option(array('name'=>'Mocha Frappuccino', 'alto' => '50', 'grande' => '54', 'venti' => '60')));	
 
 
-		$type = type::where('name', '=', 'Bebidas frías con café')->first();
+		$type = type::where('name', '=', 'Bebidas frías sin café')->first();
 		$type->options()->save(new option(array('name'=>'Frambuesa Grosella Frappucino', 'alto' => '49', 'grande' => '53', 'venti' => '59')));
 		$type->options()->save(new option(array('name'=>'Fresa Cream Frappuccino', 'alto' => '49', 'grande' => '53', 'venti' => '59')));
+		$type->options()->save(new option(array('name'=>'Green Tea Cream Frappuccino', 'alto' => '49', 'grande' => '53', 'venti' => '59')));
+		$type->options()->save(new option(array('name'=>'Helado Green Tea Latte', 'alto' => '40', 'grande' => '44', 'venti' => '47')));
+		$type->options()->save(new option(array('name'=>'Helado Shaken Green Tea', 'alto' => '40', 'grande' => '44', 'venti' => '47')));
+		$type->options()->save(new option(array('name'=>'Helado Shaken Lemon Black Tea', 'alto' => '40', 'grande' => '44', 'venti' => '47')));
+		$type->options()->save(new option(array('name'=>'Helado Shaken Lemon Hibiscus Tea', 'alto' => '40', 'grande' => '44', 'venti' => '47')));
+		$type->options()->save(new option(array('name'=>'Helado Té Chai Latte', 'alto' => '40', 'grande' => '44', 'venti' => '47')));
+		$type->options()->save(new option(array('name'=>'Mango Maracuyá Frappuccino', 'alto' => '49', 'grande' => '53', 'venti' => '59')));
+		$type->options()->save(new option(array('name'=>'Té Helado', 'alto' => '40', 'grande' => '44', 'venti' => '47')));
+		$type->options()->save(new option(array('name'=>'Vainilla Cream Frappuccino', 'alto' => '49', 'grande' => '53', 'venti' => '59')));
 		
 		// $type->options()->create(['name'=> 'Chocolate cream frappuccino', 'alto' => '49', 'grande' => '53', 'venti' => '59']);		
 		// $type->options()->create(['name'=> 'Frappucino café', 'alto' => '44', 'grande' => '49', 'venti' => '54']);		
