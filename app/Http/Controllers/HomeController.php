@@ -72,7 +72,7 @@ class HomeController extends Controller {
     			
 		        $message=$m->getChild('body');
 		        $message=$message->getData();
-		        $w->sendMessage($tel, "Tu telefono es: " . $tel);
+		        //$w->sendMessage($tel, "Tu telefono es: " . $tel);
 		        $customer = customer::where('phone', '=', $tel)->first();
 
 
@@ -102,13 +102,13 @@ class HomeController extends Controller {
 		        		var_dump("Perzonalization",$personalization);
 		        		// If the customer is already registered in, then we have to know in which step he was working on
 		        		// We then select the step that the customer has a 
-		        		
+		        		$stepNumber=1;
 		        		if ($personalization) {
 				        	$stepNumber = $personalization->step;
 				        	
 				        } else {
 				        	if ($message == "1") {
-				        		$customer->personalizations()->save( new personalization(array('code' => ' ', 'modality' => ' ', 'type' => ' ', 'option' => ' ', 'size' => ' ', 'milk' => ' ', 'step' => '1', 'foam' => ' ', 'temperature' =>  ' ',)));
+				        		$customer->personalizations()->save( new personalization(array('code' => ' ', 'modality' => ' ', 'type' => ' ', 'option' => ' ', 'size' => ' ', 'milk' => ' ', 'step' => '1', 'foam' => ' ', 'temperature' =>  ' ', 'transaction' =>'1')));
 	        					//$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
 				        		$stepNumber = 1;
 				        	} else {
@@ -122,18 +122,25 @@ class HomeController extends Controller {
 		      
 		        			case '1':
 		        				# Screen asking for the type of the coffe cold or hot
-		        				if ($message == 'frio' || $message == 'caliente' ) {
+		        				if ($message == '1' || $message == '2' ) {
 
 	        						// Query the modality from the personalization
-		        					$modality = $personalization->modality;
+	        						if($message==1) {
+	        							$modality=modality::where('name' ,'=','Frio')->first();
+	        						}
+	        						else{
+	        							$modality=modality::where('name' ,'=','Caliente')->first();
+	        						}
 		        					// Query the types given the modality
-		        					$types = $modality->types();
+		        					$types = $modality->types()->get()->toArray();
 
 	        						// Loop from the available types and append them to a variable to display to the user
 		        					$answer = '\n';
-		        					foreach ($types as $key => $value) {
+		        					$i=1;
+		        					foreach ($types as $key ) {
 		        						
-		        						$answer .=  $key + 1 . ') ' . $value . '\n';
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
 		        					}
 
 		        					// Send the message to the user with the beberage types
@@ -153,7 +160,7 @@ class HomeController extends Controller {
 	        					# If you get to this screen, then save the answer to the question of what type of coffe
 	        					
 	        					// Query the modality from the personalization
-	        					$modality = $personalization->modality;
+	        					$modality = $personalization;
 	        					// Query the types given the modality
 	        					$types = $modality->types();
 
