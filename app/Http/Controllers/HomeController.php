@@ -162,35 +162,47 @@ class HomeController extends Controller {
 	        					// Query the modality from the personalization
 	        					$modality = $personalization;
 	        					// Query the types given the modality
-	        					$types = $modality->types();
+	        					$types = $modality->types()->get()->toArray();
 
+	        					$i = 1;
+	        					foreach ($types as $key) {
+	        						if ($i == $message) {
+	        							$typeFound = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
 	        					// Check if the message inputed by the user is found in all the available types 
-	        					if (in_array($message, $types)) {
+	        					if ($found) {
 									
+									$type = type::where('name','=',$typeFound);
 									// Query the options available from the given types		        					
-		        					$options = $types->options();
+		        					$options = $type->options()->get()->toArray();
 
 		        					// Loop from the available options and append them to a variable to display to the user
 		        					$answer = '\n';
-		        					foreach ($options as $key => $value) {
-		        						
-		        						$answer .=  $key + 1 . ') ' . $value . '\n';
+		        					$i = 0;
+		        					foreach ($options as $key) {
+		        						$answer .=  $i  . ') ' . $key . '\n';
+		        						$i++;
 		        					}
 
 		        					// Send the message to the user with the possible options
 		        					$w->sendMessage($tel, "Que opción desea? " . $answer);
 
 		        					// Update the type that was chosen by the user and update the step to the next screen
-		        					$personalization->update(['type' => $message, 'step' => 3]);
+		        					$personalization->update(['type' => $typeFound, 'step' => 3]);
 
 
 		        				} else {
 
 	        						// The answer was not correct, loop from the availabele types and append them to a variable
 		        					$answer = '\n';
-		        					foreach ($types as $key => $value) {
+		        					$i=1;
+		        					foreach ($types as $key ) {
 		        						
-		        						$answer .=  $key + 1 . ') ' . $value . '\n';
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
 		        					}
 
 		        					// Resend the message to the user asking the type for his choice.
@@ -202,12 +214,20 @@ class HomeController extends Controller {
         					case '3':		
         						# Screen asking for the size of beberage
         						// Query the type from the personalization previously chosen
-	        					$type = $personalization->type;
-	        					// Query the options available from the given types
-	        					$options = $type->options();
+	        					$type = type::where('name','=',$personalization->type);
+								// Query the options available from the given types		        					
+	        					$options = $type->options()->get()->toArray();
 
+	        					$i = 1;
+	        					foreach ($options as $key) {
+	        						if ($i == $message) {
+	        							$optionFound = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
 	        					// Check if the message inputed by the user is found in all the available options 
-	        					if (in_array($message, $options)) {
+	        					if ( $found ) {
 	        						
 
 
@@ -216,16 +236,19 @@ class HomeController extends Controller {
 		        					$w->sendMessage($tel, "¿Qué tamaño desea? \n 1) Alto \n 2) Grande \n 3) Venti");
 
 		        					// Update the option that was chosen by the user and send them to the next screen
-		        					$personalization->update(['option' => $message, 'step' => 4]);
+		        					$personalization->update(['option' => $optionFound, 'step' => 4]);
 
 		        				} else {
 
 		        					// The answer was not correct, loop from the availabele types and append them to a variable
 		        					$answer = '\n';
-		        					foreach ($options as $key => $value) {
+		        					$i=1;
+		        					foreach ($options as $key ) {
 		        						
-		        						$answer .=  $key + 1 . ') ' . $value . '\n';
+		        						$answer .=  $i . ') ' . $key->name . '\n';
+		        						$i++;
 		        					}
+
 		        					$w->sendMessage($tel, "Que tipo de bebida?" .  $answer);
 
 		        				}
@@ -233,10 +256,18 @@ class HomeController extends Controller {
     						case '4':
     							# Screen asking for the type of milk 
     							
-    							$sizes = array("Alto", "Grande", "Venti");
+    							$sizes = array("1" => "Alto", "2" => "Grande", "3"=>"Venti");
+    							$i = 1;
+	        					foreach ($sizes as $key) {
+	        						if ($i == $message) {
+	        							$sizeFound = $key;
+	        							$found = true;
+	        						}
+	        						$i++;
+	        					}
 
     							// Check if the message inputed is an actual size 
-    							if (in_array($message, $sizes) ){
+    							if ( $found){
 
     								// Query all the types of milk available and append them to a variable
     								$milk = milk::orderBy('name', 'asc')->get();
@@ -251,7 +282,7 @@ class HomeController extends Controller {
     								$w->sendMessage($tel, "¿Qué leche desea?" . $answer);
 
     								// Update the size that was chosen by the user and send them to the next screen
-		        					$personalization->update(['size' => $message, 'step' => 5]);
+		        					$personalization->update(['size' => $sizeFound, 'step' => 5]);
 
 
     							} else {
