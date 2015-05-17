@@ -620,26 +620,29 @@ class HomeController extends Controller {
 	        						$shots = $personalization->personalizationShots;
 
 	        						
-	        						$bill .= "Shots: \n";
+	        						$bill .= "\n Shots: \n";
 	        						$shotCosts = 0.0;
 	        						foreach ($shots as $key) {
-		        						$bill .=  $key->name . "---- $" . $key->cost . "\n";
-		        						$shotCosts += $key->cost;
+	        							$cost = shot::where('name','=',$key->name) * $key->amount;
+		        						$bill .=  $key->name . "---- $" . cost . " \n ";
+		        						$shotCosts += $cost;
 		        					}
 
 		        					$bill .= "Toppings: \n";
 		        					$toppingsCost = 0.0;
 		        					
 	        						foreach ($toppings as $key) {
-		        						$bill .=  $key->name . "---- $" . $key->cost . "\n";
-		        						$toppingsCost += $key->cost;
+	        							$cost = topping::where('name','=',$key->name) * $key->amount;
+		        						$bill .=  $key->name . "---- $" . $cost . " \n ";
+		        						$toppingsCost += $cost;
 		        					}
 
 		        					$bill .= "Syrups: \n";
 		        					$syrupsCost = 0.0;
 	        						foreach ($syrups as $key) {
-		        						$bill .=  $key->name . "---- $" . $key->cost . "\n";
-		        						$syrupsCost += $key->cost;
+	        							$cost = syrup::where('name','=',$key->name) * $key->amount;
+		        						$bill .=  $key->name . "---- $" . $cost . " \n ";
+		        						$syrupsCost += $cost;
 		        					}
 		        					$total = $subtotal +  $shotCosts + $toppingsCost + $syrupsCost; 
 	        						
