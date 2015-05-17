@@ -99,14 +99,15 @@ class HomeController extends Controller {
 		        if ($customer) {
 		        		$transaction = $customer->personalizations()->count();
 
-		        		$personalization = personalization::where('transaction', '=', $transaction)->first();
+		        		//$personalization = personalization::where('transaction', '=', $transaction)->first();
 
+		        		$personalization = $customer->personalizations()->where('transaction', $transaction)->first(); 
 		        		// personalization::where('phone','=',$tel)->count();
 ///		        		$w->sendMessage($tel, "Tu telefono es: " . $transaction);
 		        		//$personalization = $customer->personalizations()->max('transaction');
 		        		// Get the last step that the client is working on and save it in $stepNumber
 
-		        		var_dump("Perzonalization",$personalization);
+		        		
 		        		// If the customer is already registered in, then we have to know in which step he was working on
 		        		// We then select the step that the customer has a 
 		        		$stepNumber=1;
@@ -118,7 +119,9 @@ class HomeController extends Controller {
 				        		$customer->personalizations()->save( new personalization(array('code' => ' ', 'modality' => ' ', 'type' => ' ', 'option' => ' ', 'size' => ' ', 'milk' => ' ', 'step' => '1', 'foam' => ' ', 'temperature' =>  ' ', 'transaction' =>'1')));
 
 				        		$transaction = $customer->personalizations()->count();
-				        		$personalization = personalization::where('transaction', '=', $transaction)->first();
+				        		$personalization = $customer->personalizations()->where('transaction', $transaction)->first(); 	
+				        		
+				        		//$personalization = personalization::where('transaction', '=', $transaction)->first();
 				        		//$w->sendMessage($tel, "Que tipo de bebida quisiera ordenar? \n 1) Frio \n 2) Caliente");
 				        		$stepNumber = 1;
 
@@ -356,7 +359,7 @@ class HomeController extends Controller {
 
 
 									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué toppings desea? \n (Escribir  [numero], [cantidad] )" . $answer);									
+    								$w->sendMessage($tel, "¿Qué toppings desea? \n  Ejemplo: 1,1 \n " . $answer);									
 									
     								
 
@@ -387,63 +390,85 @@ class HomeController extends Controller {
 								// check if the delimeter was found
 								if ($input) {
 
-								}
-								$toppingKey = $input[0];
-								$toppingAmount =  $input[1];
+									if (sizeof($input) >= 2) {
 
+									$toppingKey = $input[0];
+									$toppingAmount =  $input[1];
 
-								$toppings = topping::orderBy('name', 'asc')->get();
-								$found = false;
-								$i = 1;
-
-	        					foreach ($toppings as $key) {
-	        						if ($i == $toppingKey) {
-	        							$topping = $key->name;
-	        							$found = true;
-	        						}
-	        						$i++;
-	        					}
+									if (!is_numeric($toppingAmount)) {
+										$toppingAmount = 1;
+									}
 
 
 
-								// Check if the given messege is an actual topping
-								if ( $found ) {
-									
-									// Query all the possible syrup and append it to a variable
-	
-		        					$syrups = syrup::orderBy('name','asc')->get();
-									$answer = " \n " ;
-	        						$i = 1;
-		        					foreach ($syrups as $key) {
-		        						$answer .=  $i . ') ' . $key->name . " \n " ;
-		        						$i++;
-		        					}
+
+										$toppings = topping::orderBy('name', 'asc')->get();
+										$found = false;
+										$i = 1;
+
+			        					foreach ($toppings as $key) {
+			        						if ($i == $toppingKey) {
+			        							$topping = $key->name;
+			        							$found = true;
+			        						}
+			        						$i++;
+			        					}
 
 
-									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué jarabe desea? (Escribir  [numero], [cantidad] )" . $answer);
 
-									
-									$personalization->personalizationToppings()->create(['name' =>  $topping, 'amount' => $toppingAmount]);
-									$personalization->update(['step' => 7]);
-
-								} else {
-
-									// The inputed topping did not match any option
-    								
-    								$toppings = topping::orderBy('name','asc')->get();
-									$answer = " \n ";
-	        						$i = 1;
-		        					foreach ($toppings as $key) {
-		        						$answer .=  $i . ') ' . $key->name . " \n ";
-		        						$i++;
-		        					}
+										// Check if the given messege is an actual topping
+										if ( $found ) {
+											
+											// Query all the possible syrup and append it to a variable
+			
+				        					$syrups = syrup::orderBy('name','asc')->get();
+											$answer = " \n " ;
+			        						$i = 1;
+				        					foreach ($syrups as $key) {
+				        						$answer .=  $i . ') ' . $key->name . " \n " ;
+				        						$i++;
+				        					}
 
 
-									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué toppings desea? \n  (Escribir  [numero], [cantidad] )" . $answer);									
-									
+											// Send the message to the user with the possible toppings
+		    								$w->sendMessage($tel, "¿Qué jarabe desea? (Escribir  [numero], [cantidad] )" . $answer);
 
+											
+											$personalization->personalizationToppings()->create(['name' =>  $topping, 'amount' => $toppingAmount]);
+											$personalization->update(['step' => 7]);
+
+										} else {
+
+											// The inputed topping did not match any option
+		    								
+		    								$toppings = topping::orderBy('name','asc')->get();
+											$answer = " \n ";
+			        						$i = 1;
+				        					foreach ($toppings as $key) {
+				        						$answer .=  $i . ') ' . $key->name . " \n ";
+				        						$i++;
+				        					}
+
+
+											// Send the message to the user with the possible toppings
+		    								$w->sendMessage($tel, "¿Qué toppings desea? \n  Ejemplo: 1,1 \n " . $answer);									
+											
+
+										}
+									} else  {
+										// The inputed topping did not match any option
+		    								
+	    								$toppings = topping::orderBy('name','asc')->get();
+										$answer = " \n ";
+		        						$i = 1;
+			        					foreach ($toppings as $key) {
+			        						$answer .=  $i . ') ' . $key->name . " \n ";
+			        						$i++;
+			        					}
+
+										// Send the message to the user with the possible toppings
+	    								$w->sendMessage($tel, "¿Qué toppings desea? \n  Ejemplo: 1,1 \n " . $answer);		
+									}
 								}
 								break;
 							case '7':	
@@ -451,93 +476,162 @@ class HomeController extends Controller {
 								
 
 								$input = explode(",", $message);
-								$syrupKey = $input[0];
-								$syrupAmount =  $input[1];
 
 
-								$syrups = syrup::orderBy('name', 'asc')->get();
-								$found = false;
-								$i = 1;
-	        					foreach ($syrups as $key) {
-	        						if ($i == $syrupKey) {
-	        							$syrup = $key->name;
-	        							$found = true;
-	        						}
-	        						$i++;
-	        					}
+								// check if the delimeter was found
+								if ($input) {
+
+									if (sizeof($input) >= 2) {
+										$syrupKey = $input[0];
+										$syrupAmount =  $input[1];
+
+										if (!is_numeric($syrupAmount)) {
+											$syrupAmount = 1;
+										}
+
+										$syrups = syrup::orderBy('name', 'asc')->get();
+										$found = false;
+										$i = 1;
+			        					foreach ($syrups as $key) {
+			        						if ($i == $syrupKey) {
+			        							$syrup = $key->name;
+			        							$found = true;
+			        						}
+			        						$i++;
+			        					}
 
 
-								// Check if the given messege is an actual topping
-								if ( $found ) {
+										// Check if the given messege is an actual topping
+										if ( $found ) {
+											
+											// Query all the possible syrup and append it to a variable
+			
+				        					$shots = shot::orderBy('name','asc')->get();
+											$answer = " \n " ;
+			        						$i = 1;
+				        					foreach ($shots as $key) {
+				        						$answer .=  $i . ') ' . $key->name . " \n ";
+				        						$i++;
+				        					}
+
+
+											// Send the message to the user with the possible toppings
+		    								$w->sendMessage($tel, "¿Qué shot desea? \n  Escribir  [numero], [cantidad] )" . $answer);
+
+											
+											$personalization->personalizationSyrups()->Create(['name' =>  $syrup, 'amount' => $syrupAmount]);
+											$personalization->update(['step' => 8]);
+
+										} else {
+
+															// The inputed topping did not match any option
+		    								
+		    								$answer = " \n ";
+			        						$i = 1;
+				        					foreach ($syrups as $key) {
+				        						$answer .=  $i . ') ' . $key->name . " \n ";
+				        						$i++;
+				        					}
+
+											// Send the message to the user with the possible syrups
+		    								$w->sendMessage($tel, "¿Qué jarabe desea?  \n  Ejemplo: 1,1 \n" . $answer);
+
+
+										}
+									} else {
+
+	    								$answer = " \n ";
+		        						$i = 1;
+			        					foreach ($syrups as $key) {
+			        						$answer .=  $i . ') ' . $key->name . " \n ";
+			        						$i++;
+			        					}
+
+										// Send the message to the user with the possible syrups
+	    								$w->sendMessage($tel, "¿Qué jarabe desea?  \n  Ejemplo: 1,1 \n " . $answer);
 									
-									// Query all the possible syrup and append it to a variable
-	
-		        					$shots = shot::orderBy('name','asc')->get();
-									$answer = " \n " ;
-	        						$i = 1;
-		        					foreach ($shots as $key) {
-		        						$answer .=  $i . ') ' . $key->name . " \n ";
-		        						$i++;
-		        					}
-
-
-									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué shot desea? \n  Escribir  [numero], [cantidad] )" . $answer);
-
-									
-									$personalization->personalizationSyrups()->Create(['name' =>  $syrup, 'amount' => $syrupAmount]);
-									$personalization->update(['step' => 8]);
-
+									} 
 								} else {
 
-													// The inputed topping did not match any option
-    								
-    								$answer = " \n ";
-	        						$i = 1;
-		        					foreach ($syrups as $key) {
-		        						$answer .=  $i . ') ' . $key->name . " \n ";
-		        						$i++;
-		        					}
+	    								$answer = " \n ";
+		        						$i = 1;
+			        					foreach ($syrups as $key) {
+			        						$answer .=  $i . ') ' . $key->name . " \n ";
+			        						$i++;
+			        					}
 
-									// Send the message to the user with the possible syrups
-    								$w->sendMessage($tel, "¿Qué jarabe desea?  \n  (Escribir  [numero], [cantidad] )" . $answer);
-
-
+										// Send the message to the user with the possible syrups
+	    								$w->sendMessage($tel, "¿Qué jarabe desea?  \n  Ejemplo: 1,1 \n " . $answer);
 								}
 								break;
 							case '8':
 								# Screen asking for the temperature 
 								
 								$input = explode(",", $message);
-								$shotKey = $input[0];
-								$shotAmount =  $input[1];
+								// check if the delimeter was found
+								if ($input) {
+
+									if (sizeof($input) >= 2) {
+
+										$shotKey = $input[0];
+										$shotAmount =  $input[1];
+
+										if (!is_numeric($shotAmount)) {
+											$shotAmount = 1;
+										}
+
+										$shots = shot::orderBy('name', 'asc')->get();
+										$found = false;
+										$i = 1;
+			        					foreach ($shots as $key) {
+			        						if ($i == $shotKey) {
+			        							$shot = $key->name;
+			        							$found = true;
+			        						}
+			        						$i++;
+			        					}
 
 
-								$shots = shot::orderBy('name', 'asc')->get();
-								$found = false;
-								$i = 1;
-	        					foreach ($shots as $key) {
-	        						if ($i == $shotKey) {
-	        							$shot = $key->name;
-	        							$found = true;
-	        						}
-	        						$i++;
-	        					}
+										// Check if the given messege is an actual topping
+										if ( $found ) {
+											
+
+											// Send the message to the user with the possible toppings
+		    								$w->sendMessage($tel, "¿Qué temperatura desea? \n 1) Frio \n 2) Caliente \n 3) Extra caliente");
+
+											
+											$personalization->personalizationShots()->Create(['name' =>  $shot, 'amount' => $shotAmount]);
+											$personalization->update(['step' => 9]);
+
+										} else {
+
+											// The inputed topping did not match any shot
+		    								$answer = " \n ";
+			        						$i = 1;
+				        					foreach ($shots as $key) {
+				        						$answer .=  $i . ') ' . $key->name . " \n ";
+				        						$i++;
+				        					}
+
+											// Send the message to the user with the possible toppings
+		    								$w->sendMessage($tel, "¿Qué shot desea? \n (Escribir  [numero], [cantidad] )" . $answer);
 
 
-								// Check if the given messege is an actual topping
-								if ( $found ) {
-									
+										}
+									} else {
+										// The inputed topping did not match any shot
+	    								$answer = " \n ";
+		        						$i = 1;
+			        					foreach ($shots as $key) {
+			        						$answer .=  $i . ') ' . $key->name . " \n ";
+			        						$i++;
+			        					}
 
-									// Send the message to the user with the possible toppings
-    								$w->sendMessage($tel, "¿Qué temperatura desea? \n 1) Frio \n 2) Caliente \n 3) Extra caliente");
+										// Send the message to the user with the possible toppings
+	    								$w->sendMessage($tel, "¿Qué shot desea? \n (Escribir  [numero], [cantidad] )" . $answer);
 
-									
-									$personalization->personalizationShots()->Create(['name' =>  $shot, 'amount' => $shotAmount]);
-									$personalization->update(['step' => 9]);
-
+									}
 								} else {
-
 									// The inputed topping did not match any shot
     								$answer = " \n ";
 	        						$i = 1;
@@ -549,8 +643,9 @@ class HomeController extends Controller {
 									// Send the message to the user with the possible toppings
     								$w->sendMessage($tel, "¿Qué shot desea? \n (Escribir  [numero], [cantidad] )" . $answer);
 
-
 								}
+								
+
 							break;
 							case '9':
 									# Screen asking for the foam desired
@@ -727,6 +822,7 @@ class HomeController extends Controller {
 								$answer = "Gracias por su orden";
 								$w->sendMessage($tel, $answer);
 								$w->sendMessage('5218117082898',$name);
+								
 
 
 								break;
