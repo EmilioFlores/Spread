@@ -650,13 +650,74 @@ class HomeController extends Controller {
 
     								$w->sendMessage($tel, $bill);
 
-									
-									$personalization->update(['step' => 9]);
+									$answer = "\n Desea confirmar su pedido? \n 1) Si \n 2) No \n";
 
-	        						/*
-									*/
+    								$w->sendMessage($tel, $answer);
+									
+									
+									$personalization->update(['step' => 11]);
 
 	        					}
+
+								break;
+							case '11':
+								
+								if ($message == '1') {
+									// confirm order
+									
+
+
+
+									$answer = "Ingrese su primer nombre ";
+    								$w->sendMessage($tel, $answer);
+									$personalization->update(['step' => 12]);
+
+								} else {
+									$personalization->update(['step' => 0]);
+								}
+								break;
+							case '12':
+
+
+								/ Start priting the bill 
+
+
+	        						$columna = strtolower($personalization->size);
+	        						$sizeCost =  option::where('name','=', $personalization->option)->first()->$columna;
+	        						$milkCost = milk::where('name','=', $personalization->milk)->first()->cost;
+
+	        						$subtotal = $sizeCost + $milkCost;
+        							// Get the possible multiple selections
+	        						$syrups = $personalization->personalizationSyrups;
+	        						$toppings = $personalization->personalizationToppings;
+	        						$shots = $personalization->personalizationShots;
+	        						$shotCosts = 0.0;
+	        						foreach ($shots as $key) {
+	        							$cost = shot::where('name','=',$key->name)->first()->cost * $key->amount;
+		        						$shotCosts += $cost;
+		        					}
+
+		        					$toppingsCost = 0.0;
+		        					
+	        						foreach ($toppings as $key) {
+	        							$cost = topping::where('name','=',$key->name)->first()->cost * $key->amount;
+		        						$toppingsCost += $cost;
+		        					}
+
+		        					$syrupsCost = 0.0;
+	        						foreach ($syrups as $key) {
+	        							$cost = syrup::where('name','=',$key->name)->first()->cost * $key->amount;
+		        						$syrupsCost += $cost;
+		        					}
+		        					$total = $subtotal +  $shotCosts + $toppingsCost + $syrupsCost; 
+
+
+								$name = $message;
+								order::create(['personalization_id' => $personalization->id, 'name' => ' ', 'status' => '0', 'total' => $total]);
+
+								$answer = "Gracias por su orden";
+								$w->sendMessage($tel, $answer);
+
 
 								break;
 		        			default:

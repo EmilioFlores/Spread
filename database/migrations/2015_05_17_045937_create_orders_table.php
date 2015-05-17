@@ -16,6 +16,7 @@ class CreateOrdersTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('personalization_id')->unsigned();
+			$table->string('name');
 			$table->integer('status');
 			$table->decimal('total');
 			$table->timestamps();
