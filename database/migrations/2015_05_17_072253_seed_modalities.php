@@ -13,8 +13,8 @@ class SeedModalities extends Migration {
 	 */
 	public function up()
 	{
-		modality::create(['name' => 'frio']);
-		modality::create(['name' => 'caliente']);
+		modality::create(['name' => 'Frio']);
+		modality::create(['name' => 'Caliente']);
 	}
 
 	/**
